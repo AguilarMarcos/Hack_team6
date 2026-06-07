@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" role="img" aria-label="Jardin Botanico de Durango">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#c8f2d0"/><stop offset="1" stop-color="#0e7c66"/></linearGradient></defs>
+  <rect width="900" height="600" fill="url(#g)"/><path d="M450 460V180" stroke="#12312b" stroke-width="28" stroke-linecap="round"/><path d="M450 260c-130-20-180-95-175-170 100 0 175 55 175 170z" fill="#12312b"/><path d="M450 325c130-20 180-95 175-170-100 0-175 55-175 170z" fill="#0e7c66"/><path d="M450 395c-120 0-205-55-245-145 125-18 220 25 245 145z" fill="#f2b705"/><circle cx="675" cy="120" r="68" fill="#fffdf8" opacity=".62"/>
+  <text x="450" y="535" text-anchor="middle" font-family="Outfit, Arial" font-size="45" font-weight="900" fill="#fffdf8">Jardin Botanico de Durango</text>
+</svg>

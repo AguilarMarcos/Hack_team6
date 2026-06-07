@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" role="img" aria-label="Cerveceria Artesanal Durango">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#12312b"/><stop offset="1" stop-color="#f2b705"/></linearGradient></defs>
+  <rect width="900" height="600" fill="url(#g)"/><rect x="245" y="165" width="150" height="255" rx="36" fill="#f2b705" stroke="#fffdf8" stroke-width="18"/><rect x="505" y="165" width="150" height="255" rx="36" fill="#f2b705" stroke="#fffdf8" stroke-width="18"/><path d="M245 215h150M505 215h150" stroke="#fffdf8" stroke-width="22"/><path d="M395 250h45c50 0 50 95 0 95h-45M655 250h45c50 0 50 95 0 95h-45" fill="none" stroke="#fffdf8" stroke-width="22"/>
+  <text x="450" y="510" text-anchor="middle" font-family="Outfit, Arial" font-size="42" font-weight="900" fill="#fffdf8">Cerveceria Artesanal Durango</text>
+</svg>

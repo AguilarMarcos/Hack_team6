@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" role="img" aria-label="Restaurante El Tepehuano">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#12312b"/><stop offset="1" stop-color="#7a421f"/></linearGradient></defs>
+  <rect width="900" height="600" fill="url(#g)"/><path d="M0 385l160-120 135 80 115-125 160 140 95-88 235 130v198H0z" fill="#0e7c66" opacity=".7"/><circle cx="450" cy="325" r="138" fill="#fffdf8"/><circle cx="450" cy="325" r="86" fill="#e95f2a"/><path d="M365 325c50-48 120-48 170 0" fill="none" stroke="#f2b705" stroke-width="24" stroke-linecap="round"/><path d="M230 170v210M670 170v210" stroke="#fffdf8" stroke-width="24" stroke-linecap="round"/>
+  <text x="450" y="520" text-anchor="middle" font-family="Outfit, Arial" font-size="48" font-weight="900" fill="#fffdf8">Restaurante El Tepehuano</text>
+</svg>

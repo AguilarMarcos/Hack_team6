@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" role="img" aria-label="Gorditas Dona Ale">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6b3418"/><stop offset="1" stop-color="#f2b705"/></linearGradient></defs>
+  <rect width="900" height="600" fill="url(#g)"/><circle cx="690" cy="120" r="155" fill="#fff" opacity=".12"/><rect x="85" y="85" width="730" height="430" rx="42" fill="#fffdf8" opacity=".9"/>
+  <circle cx="330" cy="310" r="108" fill="#e7a84f" stroke="#7a421f" stroke-width="16"/><circle cx="455" cy="300" r="102" fill="#eec16d" stroke="#7a421f" stroke-width="14"/><path d="M267 309c42-28 83-29 126-2M393 307c45-32 91-33 136 0" fill="none" stroke="#12312b" stroke-width="16" stroke-linecap="round"/>
+  <text x="450" y="485" text-anchor="middle" font-family="Outfit, Arial" font-size="48" font-weight="900" fill="#12312b">Gorditas Dona Ale</text>
+</svg>

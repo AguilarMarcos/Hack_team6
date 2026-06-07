@@ -3,13 +3,15 @@ import { AuthContext } from './authStore';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const storedUser = window.localStorage.getItem('durangoLocalUser');
-    return storedUser ? JSON.parse(storedUser) : null;
+    try {
+      const s = window.sessionStorage.getItem('durangoLocalUser');
+      return s ? JSON.parse(s) : null;
+    } catch { return null; }
   });
 
   const saveUser = (nextUser) => {
     setUser(nextUser);
-    window.localStorage.setItem('durangoLocalUser', JSON.stringify(nextUser));
+    try { window.sessionStorage.setItem('durangoLocalUser', JSON.stringify(nextUser)); } catch { /* silent */ }
   };
 
   const loginAsGuest = () => {
@@ -47,6 +49,7 @@ export const AuthProvider = ({ children }) => {
       accountGoal: 'Cuenta completa con rutas, como llegar y calificaciones.',
       provider: 'google',
     });
+    window.history.replaceState(null, '', '/');
   };
 
   const loginWithRole = (role, name, extra = {}) => {
@@ -59,7 +62,13 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
-    window.localStorage.removeItem('durangoLocalUser');
+    // Limpia sesión y todos los datos de la app
+    try { window.sessionStorage.clear(); } catch { /* silent */ }
+    try {
+      Object.keys(window.localStorage)
+        .filter((k) => k.startsWith('durango'))
+        .forEach((k) => window.localStorage.removeItem(k));
+    } catch { /* silent */ }
   };
 
   return (

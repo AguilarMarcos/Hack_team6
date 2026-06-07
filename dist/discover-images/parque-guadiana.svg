@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" role="img" aria-label="Parque Guadiana">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#9ed7f0"/><stop offset="1" stop-color="#0e7c66"/></linearGradient></defs>
+  <rect width="900" height="600" fill="url(#g)"/><path d="M0 430c160-100 270-40 430-100 170-65 280-20 470-115v385H0z" fill="#12312b" opacity=".25"/><circle cx="250" cy="240" r="86" fill="#0e7c66"/><rect x="235" y="300" width="30" height="130" rx="15" fill="#7a421f"/><circle cx="530" cy="215" r="110" fill="#0e7c66"/><rect x="512" y="305" width="36" height="140" rx="18" fill="#7a421f"/><path d="M85 448c230-48 430-36 730 0" fill="none" stroke="#fffdf8" stroke-width="24" stroke-linecap="round"/>
+  <text x="450" y="535" text-anchor="middle" font-family="Outfit, Arial" font-size="54" font-weight="900" fill="#fffdf8">Parque Guadiana</text>
+</svg>

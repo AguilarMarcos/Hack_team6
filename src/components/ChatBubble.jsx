@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Box, Button, Chip, IconButton, Paper, Stack, TextField, Typography } from '@mui/material';
+import { useEffect, useRef, useState } from 'react';
+import { Box, Button, Chip, IconButton, Stack, TextField, Typography } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MessageCircle, Send, Sparkles, X } from 'lucide-react';
 import { businesses, routePlans } from '../data/durango';
@@ -7,124 +7,286 @@ import { useAuth } from '../context/useAuth';
 
 const prompts = ['Comer barato', 'Plan familiar', 'Cafe tranquilo', 'Comprar artesanias', 'Ruta corta'];
 
+const getFallbackResponse = (query, isGuest, businesses, routePlans) => {
+  const idx = Math.floor(query.length * 31) % businesses.length;
+  const place = businesses.find((b) =>
+    `${b.name} ${b.category} ${b.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase().split(' ')[0])
+  ) || businesses[idx];
+  const route = routePlans[query.length % routePlans.length];
+
+  return isGuest
+    ? `Te recomiendo explorar ${place.name} en ${place.location}. Como visitante puedes ver informacion, pero necesitas cuenta para rutas y navegacion.`
+    : `Te recomiendo ${place.name} en ${place.location}. Combina esta parada con la ruta "${route.title}" de ${route.duration} para una experiencia completa.`;
+};
+
 const ChatBubble = () => {
   const { user } = useAuth();
   const isGuest = user?.role === 'guest';
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [answers, setAnswers] = useState([
-    'Hola, soy tu asistente de Durango. Preguntame por comida, museos, tiendas o experiencias cercanas.',
+    { id: 0, text: 'Hola! Soy tu asistente de Durango. Preguntame por comida, museos, tiendas o experiencias cercanas.', sender: 'bot' },
   ]);
+  const [typing, setTyping] = useState(false);
+  const messagesEndRef = useRef(null);
+  const msgId = useRef(10);
 
-  const sendMessage = (event) => {
-    event.preventDefault();
-    const text = message.trim();
-    if (!text) return;
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [answers, typing]);
 
-    const place = businesses.find((business) => `${business.name} ${business.category} ${business.tags.join(' ')}`.toLowerCase().includes(text.toLowerCase().split(' ')[0])) || businesses[Math.floor(Math.random() * businesses.length)];
-    const route = routePlans[Math.floor(Math.random() * routePlans.length)];
+  const sendMessage = async (text) => {
+    const query = (text || message).trim();
+    if (!query || typing) return;
 
-    setAnswers((current) => [
-      ...current,
-      isGuest
-        ? `Te recomiendo explorar ${place.name} en ${place.location}. Como visitante puedes ver informacion, pero necesitas cuenta para rutas y como llegar.`
-        : `Te recomiendo ${place.name}. Si quieres un plan completo, combina esta parada con la ruta "${route.title}" de ${route.duration}.`,
-    ]);
+    const uid = (msgId.current += 1);
+    const botId = (msgId.current += 1);
+    setAnswers((prev) => [...prev, { id: uid, text: query, sender: 'user' }]);
     setMessage('');
+    setTyping(true);
+    setTimeout(() => {
+      setTyping(false);
+      const fallback = getFallbackResponse(query, isGuest, businesses, routePlans);
+      setAnswers((prev) => [...prev, { id: botId, text: fallback, sender: 'bot' }]);
+    }, 650);
   };
 
   return (
-    <Box sx={{ position: 'fixed', right: { xs: 16, md: 28 }, bottom: { xs: 94, md: 108 }, zIndex: 1300 }}>
+    <>
+      {/* ─── Backdrop bloqueante ─── */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 28, scale: 0.9, filter: 'blur(6px)' }}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: 24, scale: 0.92, filter: 'blur(6px)' }}
-            transition={{ type: 'spring', stiffness: 360, damping: 30 }}
-          >
-            <Paper
-              className="soft-panel"
-              elevation={0}
-              sx={{
-                width: { xs: 'calc(100vw - 32px)', sm: 390 },
-                maxHeight: { xs: '68vh', sm: 560 },
-                borderRadius: '30px',
-                overflow: 'hidden',
-                mb: 2,
-              }}
+            key="chat-blur"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.28 }}
+            onClick={() => setOpen(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              background: 'rgba(10,22,18,0.42)',
+              zIndex: 1298,
+              cursor: 'default',
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* ─── Fixed wrapper — botón siempre en la misma posición ─── */}
+      <Box
+        sx={{
+          position: 'fixed',
+          right: { xs: 16, md: 28 },
+          bottom: { xs: 94, md: 108 },
+          zIndex: 1300,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
+          gap: 2,
+          pointerEvents: 'none',
+        }}
+      >
+        {/* Panel */}
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              key="panel"
+              initial={{ opacity: 0, y: 28, scale: 0.88 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 22, scale: 0.9 }}
+              transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+              style={{ pointerEvents: 'all' }}
             >
-              <Box sx={{ p: 2.5, bgcolor: 'primary.main', color: 'white', position: 'relative', overflow: 'hidden' }}>
-                <Box sx={{ position: 'absolute', width: 150, height: 150, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.12)', right: -42, top: -64 }} />
-                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ position: 'relative' }}>
-                  <Stack direction="row" spacing={1.5} alignItems="center">
-                    <Box sx={{ width: 46, height: 46, borderRadius: '18px', bgcolor: 'secondary.main', display: 'grid', placeItems: 'center' }}>
-                      <Sparkles size={24} />
-                    </Box>
-                    <Box>
-                      <Typography variant="h3" sx={{ color: 'white', fontSize: '1.25rem' }}>Asistente Durango</Typography>
-                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.78)' }}>{isGuest ? 'Modo visitante' : 'Cuenta completa'}</Typography>
-                    </Box>
+              <Box
+                onClick={(e) => e.stopPropagation()}
+                className="soft-panel"
+                sx={{
+                  width: { xs: 'calc(100vw - 32px)', sm: 440 },
+                  maxHeight: { xs: '72vh', sm: 580 },
+                  borderRadius: '30px',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  boxShadow: '0 32px 80px rgba(10,22,18,0.28)',
+                }}
+              >
+                {/* Header */}
+                <Box
+                  sx={{
+                    p: 2.5,
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Box sx={{ position: 'absolute', width: 200, height: 200, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.07)', right: -60, top: -80 }} />
+                  <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ position: 'relative' }}>
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                      <Box sx={{ width: 46, height: 46, borderRadius: '16px', bgcolor: 'secondary.main', display: 'grid', placeItems: 'center', boxShadow: '0 8px 20px rgba(233,95,42,0.4)' }}>
+                        <Sparkles size={22} />
+                      </Box>
+                      <Box>
+                        <Typography variant="h3" sx={{ color: 'white', fontSize: '1.15rem' }}>Asistente Durango</Typography>
+                        <Stack direction="row" alignItems="center" spacing={0.6}>
+                          <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: '#4ade80' }} />
+                          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.82rem' }}>
+                            {isGuest ? 'Modo visitante' : 'Asistente local'}
+                          </Typography>
+                        </Stack>
+                      </Box>
+                    </Stack>
+                    <IconButton
+                      onClick={() => setOpen(false)}
+                      aria-label="cerrar chat"
+                      sx={{ color: 'white', '&:hover': { bgcolor: 'rgba(255,255,255,0.12)' } }}
+                    >
+                      <X size={22} />
+                    </IconButton>
                   </Stack>
-                  <IconButton onClick={() => setOpen(false)} aria-label="cerrar chat" sx={{ color: 'white' }}>
-                    <X size={22} />
-                  </IconButton>
-                </Stack>
-              </Box>
+                </Box>
 
-              <Box sx={{ p: 2.5 }}>
-                <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mb: 2 }}>
-                  {prompts.filter((prompt) => !isGuest || !prompt.toLowerCase().includes('ruta')).map((prompt) => (
-                    <Chip key={prompt} label={prompt} onClick={() => setMessage(prompt)} color={message === prompt ? 'secondary' : 'default'} variant={message === prompt ? 'filled' : 'outlined'} />
-                  ))}
-                </Stack>
+                {/* Quick prompts */}
+                <Box sx={{ px: 2, pt: 1.8, pb: 0, flexShrink: 0 }}>
+                  <Stack direction="row" spacing={0.8} sx={{ overflowX: 'auto', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' }, pb: 0.5 }}>
+                    {prompts
+                      .filter((p) => !isGuest || !p.toLowerCase().includes('ruta'))
+                      .map((prompt) => (
+                        <Chip
+                          key={prompt}
+                          label={prompt}
+                          onClick={() => sendMessage(prompt)}
+                          color="default"
+                          variant="outlined"
+                          sx={{ flexShrink: 0, cursor: 'pointer', fontSize: '0.84rem' }}
+                        />
+                      ))}
+                  </Stack>
+                </Box>
 
-                <Stack spacing={1.4} sx={{ maxHeight: 250, overflowY: 'auto', pr: 0.5, mb: 2 }}>
-                  {answers.map((answer, index) => (
-                    <Box key={`${answer}-${index}`} sx={{ alignSelf: index === 0 ? 'flex-start' : 'flex-end', maxWidth: '92%' }}>
-                      <Box sx={{ p: 1.8, borderRadius: index === 0 ? '20px 20px 20px 6px' : '20px 20px 6px 20px', bgcolor: index === 0 ? 'rgba(18,49,43,0.08)' : 'rgba(233,95,42,0.12)', border: '1px solid', borderColor: index === 0 ? 'divider' : 'rgba(233,95,42,0.24)' }}>
-                        <Typography variant="body2">{answer}</Typography>
+                {/* Messages */}
+                <Box
+                  sx={{
+                    flex: 1,
+                    overflowY: 'auto',
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1.4,
+                    scrollbarWidth: 'thin',
+                    '&::-webkit-scrollbar': { width: 4 },
+                    '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(18,49,43,0.18)', borderRadius: 2 },
+                  }}
+                >
+                  {answers.map((msg) => (
+                    <Box key={msg.id} sx={{ alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start', maxWidth: '88%' }}>
+                      <Box
+                        sx={{
+                          p: 1.8,
+                          borderRadius: msg.sender === 'user' ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
+                          bgcolor: msg.sender === 'user' ? 'secondary.main' : 'rgba(18,49,43,0.07)',
+                          color: msg.sender === 'user' ? 'white' : 'text.primary',
+                          border: '1px solid',
+                          borderColor: msg.sender === 'user' ? 'transparent' : 'divider',
+                        }}
+                      >
+                        {msg.sender === 'bot' && (
+                          <Stack direction="row" spacing={1} alignItems="flex-start">
+                              <Box sx={{ bgcolor: 'secondary.main', color: 'white', borderRadius: '8px', p: 0.6, flexShrink: 0, display: 'grid', placeItems: 'center', mt: 0.2 }}>
+                              <Sparkles size={13} />
+                            </Box>
+                            <Typography variant="body2" sx={{ lineHeight: 1.65 }}>{msg.text}</Typography>
+                          </Stack>
+                        )}
+                        {msg.sender === 'user' && (
+                          <Typography variant="body2" sx={{ color: 'white', lineHeight: 1.65 }}>{msg.text}</Typography>
+                        )}
                       </Box>
                     </Box>
                   ))}
-                </Stack>
 
-                <Box component="form" onSubmit={sendMessage}>
+                  {typing && (
+                    <Box sx={{ alignSelf: 'flex-start' }}>
+                      <Box sx={{ p: 1.6, borderRadius: '20px 20px 20px 4px', bgcolor: 'rgba(18,49,43,0.07)', border: '1px solid', borderColor: 'divider', display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'secondary.main', animation: 'fadeIn 0.6s ease-in-out infinite alternate' }} />
+                        <Typography variant="body2" sx={{ fontSize: '0.82rem', color: 'text.secondary' }}>Pensando...</Typography>
+                      </Box>
+                    </Box>
+                  )}
+
+                  <div ref={messagesEndRef} />
+                </Box>
+
+                {/* Input */}
+                <Box sx={{ p: 1.8, borderTop: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', flexShrink: 0 }}>
                   <Stack direction="row" spacing={1}>
-                    <TextField size="small" fullWidth placeholder="Escribe tu pregunta" value={message} onChange={(event) => setMessage(event.target.value)} />
-                    <Button variant="contained" color="secondary" type="submit" sx={{ minWidth: 56, px: 1.5 }} aria-label="enviar mensaje">
-                      <Send size={20} />
+                    <TextField
+                      size="small"
+                      fullWidth
+                      placeholder="Escribe tu pregunta..."
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                      disabled={typing}
+                    />
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => sendMessage()}
+                      disabled={!message.trim() || typing}
+                      sx={{ minWidth: 52, px: 1.5, borderRadius: '14px' }}
+                      aria-label="enviar mensaje"
+                    >
+                      <Send size={19} />
                     </Button>
                   </Stack>
                 </Box>
               </Box>
-            </Paper>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      <motion.div whileHover={{ scale: 1.06, y: -3 }} whileTap={{ scale: 0.96 }}>
-        <IconButton
-          onClick={() => setOpen((current) => !current)}
-          aria-label={open ? 'cerrar asistente' : 'abrir asistente'}
-          sx={{
-            width: 68,
-            height: 68,
-            bgcolor: 'secondary.main',
-            color: 'white',
-            boxShadow: '0 18px 42px rgba(233,95,42,0.38)',
-            border: '4px solid rgba(255,255,255,0.82)',
-            '&:hover': { bgcolor: 'secondary.dark' },
-          }}
+        {/* ─── Floating button — posición fija siempre ─── */}
+        <motion.div
+          whileHover={{ scale: 1.08, y: -2 }}
+          whileTap={{ scale: 0.94 }}
+          style={{ pointerEvents: 'all' }}
         >
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.span key={open ? 'close' : 'open'} initial={{ rotate: -45, opacity: 0, scale: 0.7 }} animate={{ rotate: 0, opacity: 1, scale: 1 }} exit={{ rotate: 45, opacity: 0, scale: 0.7 }} transition={{ duration: 0.18 }} style={{ display: 'grid' }}>
-              {open ? <X size={30} /> : <MessageCircle size={30} />}
-            </motion.span>
-          </AnimatePresence>
-        </IconButton>
-      </motion.div>
-    </Box>
+          <IconButton
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? 'cerrar asistente' : 'abrir asistente'}
+            sx={{
+              width: 64,
+              height: 64,
+              bgcolor: open ? 'primary.main' : 'secondary.main',
+              color: 'white',
+              boxShadow: open ? '0 14px 36px rgba(18,49,43,0.35)' : '0 18px 42px rgba(233,95,42,0.4)',
+              border: '3.5px solid rgba(255,255,255,0.9)',
+              transition: 'background-color 0.22s ease, box-shadow 0.22s ease',
+              '&:hover': { bgcolor: open ? 'primary.dark' : 'secondary.dark' },
+            }}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={open ? 'close' : 'open'}
+                initial={{ rotate: -45, opacity: 0, scale: 0.7 }}
+                animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                exit={{ rotate: 45, opacity: 0, scale: 0.7 }}
+                transition={{ duration: 0.18 }}
+                style={{ display: 'grid' }}
+              >
+                {open ? <X size={28} /> : <MessageCircle size={28} />}
+              </motion.span>
+            </AnimatePresence>
+          </IconButton>
+        </motion.div>
+      </Box>
+    </>
   );
 };
 

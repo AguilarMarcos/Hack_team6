@@ -17,6 +17,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Heart, LockKeyhole, Mail, Pencil, ShieldCheck, X } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
+import IntroModal from '../components/IntroModal';
 
 const tasteOptions = [
   'Comida local', 'Museos', 'Mercados', 'Artesanias',
@@ -90,6 +91,13 @@ const Profile = () => {
 
   return (
     <Box sx={{ pt: { xs: 11, md: 13 }, pb: 8 }}>
+      <IntroModal
+        pageKey="profile"
+        icon={<ShieldCheck size={42} />}
+        title="Tu Perfil"
+        description="Aqui puedes ver y editar tu informacion personal, intereses y preferencias de accesibilidad. Tu informacion se guarda localmente en tu dispositivo."
+        cta="Ver mi perfil"
+      />
       <Container maxWidth="md">
         {/* Header */}
         <Box sx={{ mb: 4 }}>

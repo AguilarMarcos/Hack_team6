@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" role="img" aria-label="Mirador Los Remedios">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#244f84"/><stop offset="1" stop-color="#e95f2a"/></linearGradient></defs>
+  <rect width="900" height="600" fill="url(#g)"/><circle cx="690" cy="155" r="86" fill="#f2b705"/><path d="M0 430l205-180 138 112 145-170 157 190 95-90 160 138v170H0z" fill="#12312b"/><path d="M0 460l245-145 170 100 170-125 315 170v140H0z" fill="#0e7c66" opacity=".85"/>
+  <text x="450" y="535" text-anchor="middle" font-family="Outfit, Arial" font-size="50" font-weight="900" fill="#fffdf8">Mirador Los Remedios</text>
+</svg>

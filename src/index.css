@@ -76,6 +76,12 @@ html {
 
 .leaflet-container {
   font-family: 'Outfit', sans-serif;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.leaflet-container img.leaflet-tile {
+  mix-blend-mode: normal !important;
 }
 
 button, a, input, textarea, [role='button'] {
