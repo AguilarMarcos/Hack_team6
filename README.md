@@ -1,16 +1,47 @@
-# React + Vite
+# Durango Guide — Expo Go
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Setup
 
-Currently, two official plugins are available:
+```bash
+npm install
+npx expo start
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Escanea el QR con la app **Expo Go** en tu celular.
 
-## React Compiler
+## Estructura
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+app/
+  _layout.jsx          # Root layout: fuentes + auth provider
+  index.jsx            # Redirect a auth o tabs
+  auth.jsx             # Pantalla de login / registro
+  (tabs)/
+    _layout.jsx        # Bottom nav pill animada
+    index.jsx          # Descubre — grid de lugares
+    map.jsx            # Mapa con react-native-maps
+    routes.jsx         # Rutas expandibles
+    profile.jsx        # Perfil editable
 
-## Expanding the ESLint configuration
+src/
+  context/AuthContext.js   # Auth con AsyncStorage
+  data/durango.js          # Datos sin cambios del proyecto web
+  theme/theme.js           # Colores, radios, sombras
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Dependencias clave
+
+| Librería | Uso |
+|---|---|
+| expo-router | File-based routing |
+| react-native-maps | Mapa con marcadores |
+| @expo-google-fonts/outfit | Tipografía Outfit |
+| @react-native-async-storage | Persistencia de sesión |
+| expo-linear-gradient | Fondo en AuthGateway |
+| react-native-safe-area-context | Safe areas iOS/Android |
+
+## Notas
+
+- `react-native-maps` en Expo Go usa la implementación de Google Maps en Android
+  y Apple Maps en iOS. No requiere API key para uso básico en Expo Go.
+- Los datos de `durango.js` son idénticos al proyecto web original.

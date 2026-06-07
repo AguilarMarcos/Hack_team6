@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "Durango Guide",
+    "slug": "durango-guide",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#12312B"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Para mostrarte lugares cercanos en el mapa."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#12312B"
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-font",
+        {
+          "fonts": []
+        }
+      ],
+      "expo-asset"
+    ],
+    "scheme": "durango",
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
